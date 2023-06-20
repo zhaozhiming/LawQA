@@ -6,13 +6,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(
       `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PWD}@${
         process.env.MONGO_HOST || 'localhost'
-      }:27017/dbname?authSource=admin`
+      }:27017/lawqa?authSource=admin`
     ),
     CacheModule.register({
       isGlobal: true,
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
     ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
