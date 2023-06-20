@@ -1,0 +1,7 @@
+node_modules
+lambda
+mock
+scripts
+tests
+build
+.next

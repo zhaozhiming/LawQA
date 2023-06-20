@@ -1,0 +1,19 @@
+{
+  "name": "web-project",
+  "version": "1.0.0",
+  "description": "web-project",
+  "main": "index.js",
+  "scripts": {
+    "lint-staged": "lint-staged",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^17.6.3",
+    "@commitlint/config-conventional": "^17.6.3",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2"
+  }
+}

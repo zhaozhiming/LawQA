@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+  }
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+#__next,
+#root {
+  height: 100%;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center border border-transparent rounded text-sm px-3 py-2 pointer-events-auto;
+  }
+
+  .btn-neutral {
+    @apply border text-sm bg-white text-gray-600;
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary {
+    @apply text-white bg-emerald-600;
+  }
+
+  .dark .btn-neutral {
+    @apply bg-gray-800 border-white/20 text-gray-200;
+  }
+
+}

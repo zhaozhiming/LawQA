@@ -1,0 +1,6 @@
+server.crt
+server.key
+mongo-data/
+redis-data/
+node_modules
+.DS_Store
