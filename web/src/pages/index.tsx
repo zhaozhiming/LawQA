@@ -41,14 +41,16 @@ export default function Home() {
     return (
       <div>
         <div>AI: {message.content}</div>
-        <div>
-          参考资料：
-          <ol>
-            {message.links?.map(x => (
-              <li key={x}>{x}</li>
-            ))}
-          </ol>
-        </div>
+        {message.links && (
+          <div>
+            参考资料：
+            <ol>
+              {message.links?.map(x => (
+                <li key={x}>{x}</li>
+              ))}
+            </ol>
+          </div>
+        )}
       </div>
     );
   };

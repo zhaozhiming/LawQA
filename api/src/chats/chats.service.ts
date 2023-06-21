@@ -50,11 +50,13 @@ export class ChatsService {
     });
 
     const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-      SystemMessagePromptTemplate.fromTemplate(
-        `你是一位法律专家，对中国的国家法律特别熟悉，请基于以下资料回答用户的问题。
-        如果用户的问题跟法律没有关系，请礼貌地拒绝回答。
+      SystemMessagePromptTemplate.fromTemplate(`
+      Your are a helpful assistant for the expert in Chinese law. 
+      Please answer your questions based on the following information.
+      Always answer questions in Chinese.
+      If a user's question has nothing to do with the law, politely decline to answer it.
 
-        资料：{context}`
+      information: {context}`
       ),
       HumanMessagePromptTemplate.fromTemplate('{question}'),
     ]);
