@@ -1,16 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { OpenAI } from 'langchain/llms/openai';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import {
   SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
   ChatPromptTemplate,
-  PromptTemplate,
 } from 'langchain/prompts';
-
 import { LLMChain } from 'langchain/chains';
 import { VECTOR_STORE_DIRECTORY } from '../common/constants';
 
@@ -25,22 +21,20 @@ export class ChatsService {
   private checkChain = null;
   private chatChain = null;
 
-  constructor(private configService: ConfigService) {
-    const checkModel = new OpenAI({
+  constructor() {
+    const checkModel = new ChatOpenAI({
       openAIApiKey: process.env.CHATGPT_APIKEY,
       temperature: 0,
-      maxTokens: 5,
+      maxTokens: 1,
     });
-    const template = `
-    Your are a helpful assistant for the expert in Chinese law. 
-    Please help me to judge whether the user question is related to the law. 
-    If yes, please answer 'Y', if not, please answer 'N'. 
-    Just reply one character, do not output additional information.
-    user question: {question}`;
-    const checkPrompt = new PromptTemplate({
-      template: template,
-      inputVariables: ['question'],
-    });
+    const checkPrompt = ChatPromptTemplate.fromPromptMessages([
+      SystemMessagePromptTemplate.fromTemplate(`
+      Your are a helpful assistant for the expert in Chinese law. 
+      Please help me to judge whether the user question is related to the law. 
+      If yes, please answer 'Y', if not, please answer 'N'. 
+      Just reply one character, do not output additional information.`),
+      HumanMessagePromptTemplate.fromTemplate('{question}'),
+    ]);
     this.checkChain = new LLMChain({ llm: checkModel, prompt: checkPrompt });
 
     const chatModel = new ChatOpenAI({
@@ -48,7 +42,6 @@ export class ChatsService {
       temperature: 0.9,
       maxTokens: 500,
     });
-
     const chatPrompt = ChatPromptTemplate.fromPromptMessages([
       SystemMessagePromptTemplate.fromTemplate(`
       Your are a helpful assistant for the expert in Chinese law. 
@@ -56,8 +49,7 @@ export class ChatsService {
       Always answer questions in Chinese.
       If a user's question has nothing to do with the law, politely decline to answer it.
 
-      information: {context}`
-      ),
+      information: {context}`),
       HumanMessagePromptTemplate.fromTemplate('{question}'),
     ]);
     this.chatChain = new LLMChain({ llm: chatModel, prompt: chatPrompt });
