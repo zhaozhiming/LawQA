@@ -24,10 +24,14 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setMessages([...messages, { id: uuidv4(), role: 'user', content: input }]);
+    const newMessags = [
+      ...messages,
+      { id: uuidv4(), role: 'user', content: input } as Message,
+    ];
+    setMessages(newMessags);
     setInput('');
 
-    const res = await submitQuestion(input);
+    const res = await submitQuestion(newMessags);
     setResult({
       answer: res.answer,
       links: res.links,

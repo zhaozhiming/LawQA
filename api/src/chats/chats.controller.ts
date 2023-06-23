@@ -10,8 +10,8 @@ export class ChatsController {
 
   @Post()
   async chat(@Body() data: CreateChatDto) {
-    const { prompt } = data;
-    const chat = await this.chatsService.chat(prompt);
+    const { messages } = data;
+    const chat = await this.chatsService.chat(messages);
     return {
       code: 0,
       data: chat,

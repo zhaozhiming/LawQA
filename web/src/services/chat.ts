@@ -5,19 +5,21 @@ export interface QaResult {
 
 export interface Message {
   id: string;
-  content: string; 
+  content: string;
   role: 'system' | 'user' | 'assistant';
   links?: string[];
 }
 
-export const submitQuestion = async (prompt: string): Promise<QaResult> => {
+export const submitQuestion = async (
+  messages: Message[]
+): Promise<QaResult> => {
   const response = await fetch('/api/chats', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      prompt,
+      messages,
     }),
   });
   if (response.ok) {

@@ -8,18 +8,21 @@ import {
   ChatPromptTemplate,
 } from 'langchain/prompts';
 import { LLMChain } from 'langchain/chains';
+import {
+  AIChatMessage,
+  HumanChatMessage,
+  SystemChatMessage,
+} from 'langchain/schema';
 import { VECTOR_STORE_DIRECTORY } from '../common/constants';
+import { Message, QaResult } from '../data-structure';
 
-export interface QaResult {
-  answer: string;
-  links?: string[];
-}
+const embeddings = new OpenAIEmbeddings();
 
 @Injectable()
 export class ChatsService {
   private readonly logger = new Logger(ChatsService.name);
   private checkChain = null;
-  private chatChain = null;
+  private chatModel = null;
 
   constructor() {
     const checkModel = new ChatOpenAI({
@@ -37,22 +40,11 @@ export class ChatsService {
     ]);
     this.checkChain = new LLMChain({ llm: checkModel, prompt: checkPrompt });
 
-    const chatModel = new ChatOpenAI({
+    this.chatModel = new ChatOpenAI({
       openAIApiKey: process.env.CHATGPT_APIKEY,
       temperature: 0.9,
       maxTokens: 500,
     });
-    const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-      SystemMessagePromptTemplate.fromTemplate(`
-      Your are a helpful assistant for the expert in Chinese law. 
-      Please answer your questions based on the following information.
-      Always answer questions in Chinese.
-      If a user's question has nothing to do with the law, politely decline to answer it.
-
-      information: {context}`),
-      HumanMessagePromptTemplate.fromTemplate('{question}'),
-    ]);
-    this.chatChain = new LLMChain({ llm: chatModel, prompt: chatPrompt });
   }
 
   async checkPrompt(prompt: string): Promise<boolean> {
@@ -60,22 +52,47 @@ export class ChatsService {
     return res.text.includes('Y');
   }
 
-  async chat(prompt: string): Promise<QaResult> {
-    const isLawQuestion = await this.checkPrompt(prompt);
+  async chat(messages: Message[]): Promise<QaResult> {
+    const userPrompt = messages[messages.length - 1];
+    const isLawQuestion = await this.checkPrompt(userPrompt.content);
     if (!isLawQuestion) {
       return {
-        answer: '很抱歉，作为法律专家，我无法回答跟法律无关的问题。',
+        answer:
+          '很抱歉，作为法律专家，我可能无法就与法律无关的话题展开深入的交谈。',
       };
     }
     const loadedVectorStore = await HNSWLib.load(
       VECTOR_STORE_DIRECTORY,
-      new OpenAIEmbeddings()
+      embeddings
     );
-    const links = await loadedVectorStore.similaritySearch(prompt, 2);
-    const res = await this.chatChain.call({
-      question: prompt,
-      context: links.map(link => link.pageContent).join('\n'),
-    });
+    const links = await loadedVectorStore.similaritySearch(
+      userPrompt.content,
+      2
+    );
+    const chatMessages = [
+      new SystemChatMessage(`
+      You are a valuable assistant to the Chinese law expert. 
+      Please provide answers to questions based on the information enclosed within four pound signs (####).
+      Always answer questions in Chinese.
+      If a user's question has nothing to do with the law, politely decline to answer it.`),
+    ];
+    chatMessages.push(
+      ...messages.slice(0, messages.length - 1).map(x => {
+        return x.role === 'user'
+          ? new HumanChatMessage(x.content)
+          : new AIChatMessage(x.content);
+      })
+    );
+    chatMessages.push(
+      new HumanChatMessage(`
+      user question: ${userPrompt.content}
+
+      ####information: ${links
+        .map(x => x.pageContent)
+        .join('\n' + '-'.repeat(20) + '\n')}####
+      `)
+    );
+    const res = await this.chatModel.call(chatMessages);
     return {
       answer: res.text,
       links: links.map(link => link.pageContent),
