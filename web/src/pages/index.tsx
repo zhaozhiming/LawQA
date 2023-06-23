@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { AiOutlineRobot, AiOutlineUser } from 'react-icons/ai';
 import { Message, QaResult, submitQuestion } from '@/services/chat';
 
 export default function Home() {
@@ -40,14 +41,21 @@ export default function Home() {
 
   const renderMessage = (message: Message) => {
     return (
-      <div key={message.id}>
-        <div>
-          {message.role === 'user' ? 'User' : 'AI'}: {message.content}
+      <div className="flex flex-col py-8 divide-y" key={message.id}>
+        <div className="flex flex-row mb-6">
+          <div className="mr-2 mt-0.5 ">
+            {message.role === 'user' ? (
+              <AiOutlineUser className="h-6 w-6" />
+            ) : (
+              <AiOutlineRobot className="h-6 w-6 text-lime-500" />
+            )}
+          </div>
+          <span>{message.content}</span>
         </div>
         {message.links && (
-          <div>
-            参考资料：
-            <ol>
+          <div className="pt-6">
+            <h3 className="text-sm">参考资料</h3>
+            <ol className="mt-2 flex flex-col gap-y-2 text-xs pl-4 list-disc">
               {message.links?.map(x => (
                 <li key={x}>{x}</li>
               ))}
@@ -63,12 +71,14 @@ export default function Home() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md py-24 flex flex-col stretch">
-      {messages.length > 0 ? messages.map(m => renderMessage(m)) : null}
+    <div className="mx-auto w-full max-w-xl pt-12 pb-20 flex flex-col stretch bg-zinc-50">
+      <div className="flex flex-col divide-y px-8 min-h-screen ">
+        {messages.length > 0 ? messages.map(m => renderMessage(m)) : null}
+      </div>
 
       <form onSubmit={handleSubmit}>
         <input
-          className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2"
+          className="fixed w-full max-w-lg mx-4 bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2"
           value={input}
           placeholder="请输入您的问题..."
           onChange={handleInputChange}
