@@ -398,3 +398,6 @@ dist
 
 # mongo-data
 mongo-data/
+
+# source doc files
+source-docs/
