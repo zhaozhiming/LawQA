@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { Injectable, Logger } from '@nestjs/common';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
@@ -88,7 +89,13 @@ export class ChatsService {
       user question: ${userPrompt.content}
 
       ####information: ${links
-        .map(x => x.pageContent)
+        .map(x => {
+          const lawName = path.basename(
+            x.metadata.source,
+            path.extname(x.metadata.source)
+          );
+          return `${lawName}:${x.pageContent}`;
+        })
         .join('\n' + '-'.repeat(20) + '\n')}####
       `)
     );

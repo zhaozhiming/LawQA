@@ -39,12 +39,11 @@ export default function Home() {
   };
 
   const renderMessage = (message: Message) => {
-    if (message.role === 'user') {
-      return <div>User: {message.content}</div>;
-    }
     return (
-      <div>
-        <div>AI: {message.content}</div>
+      <div key={message.id}>
+        <div>
+          {message.role === 'user' ? 'User' : 'AI'}: {message.content}
+        </div>
         {message.links && (
           <div>
             参考资料：
