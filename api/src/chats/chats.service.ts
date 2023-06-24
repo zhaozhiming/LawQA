@@ -94,7 +94,7 @@ export class ChatsService {
             x.metadata.source,
             path.extname(x.metadata.source)
           );
-          return `${lawName}:${x.pageContent}`;
+          return `${lawName}: ${x.pageContent}`;
         })
         .join('\n' + '-'.repeat(20) + '\n')}####
       `)
@@ -102,7 +102,13 @@ export class ChatsService {
     const res = await this.chatModel.call(chatMessages);
     return {
       answer: res.text,
-      links: links.map(link => link.pageContent),
+      links: links.map(link => {
+        const lawName = path.basename(
+          link.metadata.source,
+          path.extname(link.metadata.source)
+        );
+        return `${link.pageContent} —— ${lawName}`;
+      }),
     };
   }
 }
