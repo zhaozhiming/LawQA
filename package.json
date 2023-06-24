@@ -1,7 +1,7 @@
 {
-  "name": "web-project",
+  "name": "lawqa",
   "version": "1.0.0",
-  "description": "web-project",
+  "description": "A question answering system for law in Chinese.",
   "main": "index.js",
   "scripts": {
     "lint-staged": "lint-staged",

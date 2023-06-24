@@ -1,26 +1,5 @@
 version: '3.3'
 services:
-  mongo:
-    image: mongo:4.2
-    container_name: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PWD}
-    volumes:
-      - /home/ubuntu/myproject/mongo-data:/data/db/
-    restart: always
-    networks:
-      - custom_net
-  redis:
-    image: redis:5
-    container_name: redis
-    command: redis-server --requirepass ${REDIS_PWD} --appendonly yes
-    volumes:
-      - /home/ubuntu/myproject/redis-data:/data
-    networks:
-      - custom_net
-    restart: always
-  
   web:
     image: web:latest
     container_name: web
@@ -41,18 +20,7 @@ services:
     image: api:latest
     container_name: api
     environment:
-      - SALT=${SALT}
-      - IV=${IV}
-      - JWT_SECRET=${JWT_SECRET}
       - CHATGPT_APIKEY=${CHATGPT_APIKEY}
-      - MONGO_USER=${MONGO_USER}
-      - MONGO_PWD=${MONGO_PWD}
-      - MONGO_HOST=${MONGO_HOST}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PWD=${REDIS_PWD}
-    depends_on:
-      - mongo
-      - redis 
     restart: always
     networks:
       - custom_net
